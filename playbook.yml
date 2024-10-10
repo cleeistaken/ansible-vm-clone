@@ -61,5 +61,4 @@
         validate_certs: no
         name: "{{ new_vm_name }}"
         datacenter: "{{ vm_datacenter }}"
-        state: guesttools_running
       delegate_to: localhost
