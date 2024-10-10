@@ -15,16 +15,6 @@
     snapshot_name: "{{ source_snapshot_name }}"        # The snapshot to clone from
     new_vm_name: "{{ target_vm_name }}"  # The name of the new VM
     vm_power_state: "poweredon"          # Set to 'poweredon' or 'poweredoff'
-    vm_customization:
-      domain: "example.com"
-      dns_servers:
-        - "8.8.8.8"
-        - "8.8.4.4"
-      ip:
-        - ip: "192.168.1.101"
-          subnet: "255.255.255.0"
-          gateway: "192.168.1.1"
-          dns: ["8.8.8.8", "8.8.4.4"]
 
   tasks:
     - name: Clone VM from a specific snapshot
@@ -43,13 +33,7 @@
         snapshot_src: "{{ snapshot_name }}"           # Name of the snapshot to clone from
         networks:
           - name: "{{ vm_network }}"
-            ip: "{{ vm_customization.ip[0].ip }}"
-            netmask: "{{ vm_customization.ip[0].subnet }}"
-            gateway: "{{ vm_customization.ip[0].gateway }}"
-            type: "static"
-        customization:
-          domain: "{{ vm_customization.domain }}"
-          dns_servers: "{{ vm_customization.dns_servers }}"
+            type: dhcp
         state: present
       delegate_to: localhost
 
