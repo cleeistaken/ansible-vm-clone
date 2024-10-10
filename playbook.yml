@@ -1,0 +1,70 @@
+---
+- name: Clone a vSphere virtual machine from a specific snapshot
+  hosts: localhost
+  gather_facts: no
+  vars:
+    vcenter_hostname: "vcenter.example.com"
+    vcenter_username: "administrator@vsphere.local"
+    vcenter_password: "yourpassword"
+    vm_datacenter: "Datacenter"
+    vm_cluster: "Cluster"
+    vm_folder: "/Datacenter/vm"
+    vm_datastore: "Datastore"
+    vm_network: "VM Network"
+    source_vm_name: "Source-VM"          # The source VM to clone from
+    snapshot_name: "Snapshot-Name"        # The snapshot to clone from
+    new_vm_name: "Cloned-VM-from-Snapshot"  # The name of the new VM
+    vm_resource_pool: "Resources"
+    vm_power_state: "poweredon"          # Set to 'poweredon' or 'poweredoff'
+    vm_customization:
+      domain: "example.com"
+      dns_servers:
+        - "8.8.8.8"
+        - "8.8.4.4"
+      ip:
+        - ip: "192.168.1.101"
+          subnet: "255.255.255.0"
+          gateway: "192.168.1.1"
+          dns: ["8.8.8.8", "8.8.4.4"]
+
+  tasks:
+    - name: Clone VM from a specific snapshot
+      community.vmware.vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ vm_datacenter }}"
+        folder: "{{ vm_folder }}"
+        cluster: "{{ vm_cluster }}"
+        datastore: "{{ vm_datastore }}"
+        name: "{{ new_vm_name }}"
+        template: "{{ source_vm_name }}"  # Use the source VM as the template
+        power_on: "{{ vm_power_state == 'poweredon' }}"
+        snapshot_from_vm: "{{ source_vm_name }}"  # Specify the VM containing the snapshot
+        snapshot: "{{ snapshot_name }}"           # Name of the snapshot to clone from
+        networks:
+          - name: "{{ vm_network }}"
+            ip: "{{ vm_customization.ip[0].ip }}"
+            netmask: "{{ vm_customization.ip[0].subnet }}"
+            gateway: "{{ vm_customization.ip[0].gateway }}"
+            type: "static"
+        hardware:
+          memory_mb: 4096
+          num_cpus: 2
+        customization:
+          domain: "{{ vm_customization.domain }}"
+          dns_servers: "{{ vm_customization.dns_servers }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Wait for guest tools to be ready
+      community.vmware.vmware_guest_tools_wait:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        name: "{{ new_vm_name }}"
+        datacenter: "{{ vm_datacenter }}"
+        state: guesttools_running
+      delegate_to: localhost
