@@ -3,18 +3,17 @@
   hosts: localhost
   gather_facts: no
   vars:
-    vcenter_hostname: "vcenter.example.com"
-    vcenter_username: "administrator@vsphere.local"
-    vcenter_password: "yourpassword"
-    vm_datacenter: "Datacenter"
-    vm_cluster: "Cluster"
-    vm_folder: "/Datacenter/vm"
-    vm_datastore: "Datastore"
-    vm_network: "VM Network"
-    source_vm_name: "Source-VM"          # The source VM to clone from
-    snapshot_name: "Snapshot-Name"        # The snapshot to clone from
-    new_vm_name: "Cloned-VM-from-Snapshot"  # The name of the new VM
-    vm_resource_pool: "Resources"
+    vcenter_hostname: "{{ server }}"
+    vcenter_username: "{{ user }}"
+    vcenter_password: "{{ password }}"
+    vm_datacenter: "{{ datacenter }}"
+    vm_cluster: "{{ cluster }}"
+    vm_folder: "{{ datacenter }}/vm"
+    vm_datastore: "{{ datastore }}"
+    vm_network: "{{ network }}"
+    source_vm_name: "{{ source_vm }}"          # The source VM to clone from
+    snapshot_name: "{{ snapshot_name }}"        # The snapshot to clone from
+    new_vm_name: "{{ new_vm_name }}"  # The name of the new VM
     vm_power_state: "poweredon"          # Set to 'poweredon' or 'poweredoff'
     vm_customization:
       domain: "example.com"
@@ -49,9 +48,6 @@
             netmask: "{{ vm_customization.ip[0].subnet }}"
             gateway: "{{ vm_customization.ip[0].gateway }}"
             type: "static"
-        hardware:
-          memory_mb: 4096
-          num_cpus: 2
         customization:
           domain: "{{ vm_customization.domain }}"
           dns_servers: "{{ vm_customization.dns_servers }}"
