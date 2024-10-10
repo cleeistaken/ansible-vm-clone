@@ -34,7 +34,6 @@
         networks:
           - name: "{{ vm_network }}"
             type: dhcp
-        state: present
       delegate_to: localhost
 
     - name: Wait for guest tools to be ready
