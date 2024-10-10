@@ -39,9 +39,8 @@
         datastore: "{{ vm_datastore }}"
         name: "{{ new_vm_name }}"
         template: "{{ source_vm_name }}"  # Use the source VM as the template
-        power_on: "{{ vm_power_state == 'poweredon' }}"
-        snapshot_from_vm: "{{ source_vm_name }}"  # Specify the VM containing the snapshot
-        snapshot: "{{ snapshot_name }}"           # Name of the snapshot to clone from
+        state: "{{ vm_power_state }}"
+        snapshot_src: "{{ snapshot_name }}"           # Name of the snapshot to clone from
         networks:
           - name: "{{ vm_network }}"
             ip: "{{ vm_customization.ip[0].ip }}"
